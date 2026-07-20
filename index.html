@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Tap Kotak</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    p {
+      opacity: 0.9;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      background: #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    #target {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    #startBtn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #startBtn:disabled {
+      background: #64748b;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Game Tap Kotak</h1>
+    <p>Sentuh kotak secepat mungkin sebelum waktu habis.</p>
+
+    <div class="info">
+      <div>Skor: <span id="score">0</span></div>
+      <div>Waktu: <span id="time">30</span></div>
+    </div>
+
+    <div id="gameArea">
+      <div id="target">TAP</div>
+    </div>
+
+    <button id="startBtn">Mulai Game</button>
+    <div id="status">Tekan tombol untuk mulai bermain.</div>
+  </div>
+
+  <script>
+    const gameArea = document.getElementById("gameArea");
+    const target = document.getElementById("target");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const startBtn = document.getElementById("startBtn");
+    const statusEl = document.getElementById("status");
+
+    let score = 0;
+    let timeLeft = 30;
+    let timer = null;
+    let playing = false;
+
+    function moveTarget() {
+      const maxX = gameArea.clientWidth - 70;
+      const maxY = gameArea.clientHeight - 70;
+
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+
+      target.style.left = x + "px";
+      target.style.top = y + "px";
+    }
+
+    function updateUI() {
+      scoreEl.textContent = score;
+      timeEl.textContent = timeLeft;
+    }
+
+    function endGame() {
+      playing = false;
+      clearInterval(timer);
+      target.style.display = "none";
+      startBtn.disabled = false;
+      startBtn.textContent = "Main Lagi";
+      statusEl.textContent = "Waktu habis! Skor akhir kamu: " + score;
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      playing = true;
+      updateUI();
+
+      startBtn.disabled = true;
+      statusEl.textContent = "Game dimulai!";
+      target.style.display = "flex";
+      moveTarget();
+
+      timer = setInterval(() => {
+        timeLeft--;
+        updateUI();
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    target.addEventListener("pointerdown", function(e) {
+      e.preventDefault();
+      if (!playing) return;
+      score++;
+      updateUI();
+      moveTarget();
+    });
+
+    startBtn.addEventListener("click", startGame);
+
+    window.addEventListener("resize", () => {
+      if (playing) moveTarget();
+    });
+  </script>
+</body>
+  </html>
